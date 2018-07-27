@@ -17,32 +17,36 @@
 
 #include"EventDL3Handler.h"
 
-EventDL3Handler::EventDL3Handler(const char* _fitsFileName,int _idObs,int _idRepo,double _tmin,double _tmax,double _rate,const char * _userId,const char * _userPwd){
+EventDL3Handler::EventDL3Handler(const char* _fitsFileName, int _idObs, int _idRepo, double _rate, const char * _userId, const char * _userPwd){
 
-  cout << "EventDL3HandlerConstructor" << endl;
 
   const char * fitsFileName = _fitsFileName;
-  cout << "FitsFileName: " << fitsFileName << endl;
   idObs = _idObs;
-  cout << "idObs: " << idObs << endl;
   idRepo = _idRepo;
-  cout << "idREpo: " << idRepo << endl;
-  tmin = _tmin;
-  cout << "tmin: " << tmin << endl;
-  tmax = _tmax;
-  cout << "tmax: " << tmax << endl;
   rate = _rate;
-  cout << "rate: " << rate << endl;
   userId = _userId;
-  cout << "userId: " << userId << endl;
   userPwd = _userPwd;
 
+/*
+  cout << "EventDL3HandlerConstructor" << endl;
+  cout << "FitsFileName: " << fitsFileName << endl;
+  cout << "idObs: " << idObs << endl;
+  cout << "idREpo: " << idRepo << endl;
+  cout << "rate: " << rate << endl;
+  cout << "userId: " << userId << endl;
   cout << "userPwd: " << userPwd << endl;
+*/
 
   int nrows = 0;
   int ncols = 0;
 
+  string uId(userId);
+  string uPwd(userPwd);
+
   FitsReader fitsreader(fitsFileName);
+  DBConnector dbConnector(idObs, idRepo, uId, uPwd);
+
+  //dbConnector.connect();
 
   fitsreader.OpenFitsFile();
 
@@ -51,19 +55,31 @@ EventDL3Handler::EventDL3Handler(const char* _fitsFileName,int _idObs,int _idRep
 
   hdu = fitsreader.getHDU();
 
+  /*    PRINT HDU VALUES  */
   for(std::vector<string>::iterator it = hdu.begin(); it != hdu.end(); ++it) {
 
     cout << *it << endl;
   }
 
 
-  table = fitsreader.getTable();
 
-  for(std::vector<double>::iterator it = table.begin(); it != table.end(); ++it) {
+  double **table = fitsreader.getTable();
 
-    cout << *it << endl;
+  //int tmp = 0;
+
+  for (int jj = 0; jj < rate; jj++) {
+
+    for (int ii = 0; ii < ncols; ii++)
+      {
+
+        cout << table[jj][ii] << endl;
+
+      }
+      //getchar();
   }
-  getchar();
+
+  //tmp = rate;
+  dbConnector.writeInDB(idObs, idRepo, rate, table);
 
 
 }

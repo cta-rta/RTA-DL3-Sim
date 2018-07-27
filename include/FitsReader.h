@@ -34,12 +34,12 @@ public:
   long getNrows();
   int getNcols();
   std::vector <string> getHDU();
-  std::vector <double>  getTable();
+  //std::vector <double>  getTable();
+  double ** getTable();
 
   const char * fitsFileName;
   fitsfile *fptr;      /* FITS file pointer, defined in fitsio.h */
-  //char nullstr[]="*"; //*val, value[1000];
-  //double *val, value[1000];
+
   char keyword[FLEN_KEYWORD], colname[FLEN_VALUE];
   int status = 0;   /*  CFITSIO status value MUST be initialized to zero!  */
   int hdunum;
@@ -52,6 +52,7 @@ public:
   long jj;
   long nrows =0;
   std::vector<string> hdu;
-  std::vector<double> table;
+  //std::vector<double> table;
+  double ** table;
   static string colNameArray[8];
 };

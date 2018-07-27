@@ -18,6 +18,7 @@
 #include<vector>
 
 #include"FitsReader.h"
+#include"DBConnector.h"
 
 using std::string;
 using std::cout;
@@ -25,13 +26,11 @@ using std::endl;
 
 class EventDL3Handler {
 public:
-  EventDL3Handler(const char * fitsFileNamePath,int idObs,int idRepo,double tmin,double tmax,double rate,const char * userId,const char * userPwd);
+  EventDL3Handler(const char * fitsFileNamePath, int idObs, int idRepo, double rate, const char * userId, const char * userPwd);
 
   const char * fitsFileName;
   int idObs;
   int idRepo;
-	double tmin;
-	double tmax;
 	double rate;
 	string userId;
 	string userPwd;

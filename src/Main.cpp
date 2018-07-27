@@ -17,8 +17,7 @@
 
 #include<iostream>
 
-//#include "CtaEvtReader.h"
-//#include "FileWriter.h"
+
 #include"EventDL3Handler.h"
 
 
@@ -44,16 +43,14 @@ int main(int argc, char *argv[])
 
 	cout << startString << endl;
 
-	if(argc != 9) {
-		cout << "Insert 9 input parameters:\n"
+	if(argc != 7) {
+		cout << "Insert 6 input parameters:\n"
 		"1 - fitsFileNamePath: Input fits file path.\n"
 		"2 - idObs: \n"
 		"3 - idRepo: \n"
-		"4 - tmin: \n"
-		"5 - tmax: \n"
-		"6 - rate: \n"
-		"7 - userId: \n"
-		"8 - userPwd: \n"
+		"4 - rate: How events per second insert in DB.\n"
+		"5 - userId: Input database user id.\n"
+		"6 - userPwd: Input database user password\n"
 		 << endl;
 
 		cout << endString << endl;
@@ -63,24 +60,20 @@ int main(int argc, char *argv[])
   const char * fitsFileName = argv[1];
   int idObs = atoi(argv[2]);
   int idRepo = atoi(argv[3]);
-	double tmin = atof(argv[4]);
-	double tmax = atof(argv[5]);
-	double rate = atof(argv[6]);
-	const char * userId = argv[7];
-	const char * userPwd = argv[8];
+	double rate = atof(argv[4]);
+	const char * userId = argv[5];
+	const char * userPwd = argv[6];
 
 	// PRINT INPUT PARAMETERS
-	cout << "\n" << endl;
+	cout << "\n	=====" << endl;
 	cout << "fitsFileNamePath: " << fitsFileName << endl;
 	cout << "idObs: " << idObs << endl;
 	cout << "idRepo: " << idRepo << endl;
-	cout << "tmin: " << tmin << endl;
-	cout << "tmax: " << tmax << endl;
 	cout << "rate: " << rate << endl;
 	cout << "userId: " << userId << endl;
-	cout << "userPwd: " << userPwd << endl;
+	cout << "\n	=====" << endl;
 
-	EventDL3Handler evtDL3Handler(fitsFileName,idObs,idRepo,tmin,tmax,rate,userId,userPwd);
+	EventDL3Handler evtDL3Handler(fitsFileName, idObs, idRepo, rate, userId, userPwd);
 
 
 

@@ -68,12 +68,12 @@ int FitsReader::OpenFitsFile() {
 }
 
 long FitsReader::getNrows(){
-  cout << "nrowsFR: " << nrows << endl;
+  //cout << "nrowsFR: " << nrows << endl;
   return nrows;
 }
 
 int FitsReader::getNcols(){
-  cout << "nclosFR: " << ncols << endl;
+  //cout << "nclosFR: " << ncols << endl;
   return ncols;
 }
 
@@ -92,26 +92,35 @@ vector<string> FitsReader::getHDU(){
   return hdu;
 }
 
-vector<double> FitsReader::getTable(){
+//vector<double> FitsReader::getTable(){
+double ** FitsReader::getTable(){
 
 
-  double value[9]; //value può essere vettore di 8? TO VERiFY
+  //cout << "ncols: " << ncols << endl;
+  double value[ncols];
+
+  double** table = new double*[nrows];
+
 
 
   for (jj = 1; jj <= nrows && !status; jj++) {
 
+    table[jj-1] = new double[ncols];
+
       for (ii = 1; ii <= ncols; ii++)
       {
-
           /* read value as double*/
-          if (fits_read_col_dbl(fptr,ii,jj, 1,1, 0, &value[ii], &anynul,&status) ) {
+          if (fits_read_col_dbl(fptr,ii,jj, 1,1, 0, &value[ii-1], &anynul,&status) ) {
             break;
           }
+          //cout << jj << " " << ii << endl;
+          table[jj-1][ii-1] = value[ii-1];
 
-          //cout << "value " << ii <<": " << value[ii] << endl;
-          table.push_back(value[ii]);
+          //cout << "value " << ii << " "<< jj<<": " << table[jj][ii] << endl;
+          //table.push_back(value[ii]);
           //cout << "Pushato " << ii <<"-esimo elemento" << endl;
       }
+
       //getchar();
   }
 

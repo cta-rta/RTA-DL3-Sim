@@ -27,6 +27,12 @@ endif
 ifndef CFITSIO
 $(error CFITSIO is not set.)
 endif
+ifndef MYSQL_CXX_CNT
+$(error MYSQL_CXX_CNT is not set.)
+endif
+ifndef BOOST_PATH
+$(error BOOST_PATH is not set.)
+endif
 
 ####### 1) Project names and system
 SYSTEM= $(shell gcc -dumpmachine)
@@ -46,7 +52,8 @@ LIB_DESTDIR = lib
 
 CXX = g++
 
-CXXFLAGS = -std=c++11 -O2 -I $(INCLUDE_DIR) $(RTALIB)
+#CXXFLAGS = -std=c++11 -O2 -I $(INCLUDE_DIR) $(RTALIB)
+CXXFLAGS = -std=c++11 -O2 -I $(INCLUDE_DIR) $(RTALIB) $(MYSQL_CXX_CNT)
 
 ifeq ($(DEBUG),1)
 	CXXFLAGS += -DDEBUG
@@ -59,8 +66,19 @@ endif
 
 LIBS += -L $(RTALIB)/lib/ -lRTA
 
-CXXFLAGS += -I$(CFITSIO)/include
 LIBS += -L$(CFITSIO)/lib -lcfitsio
+
+LIBS += -L$(MYSQL_CXX_CNT)/lib64 -lmysqlcppconn	#NEW ADDED
+
+CXXFLAGS += -I$(MYSQL_CXX_CNT)/include	#NEW ADDED
+
+CXXFLAGS += -I$(CFITSIO)/include
+
+CXXFLAGS += -I$(BOOST_PATH)	#NEW ADDED
+
+CXXFLAGS += -Wl,-Bdynamic	#NEW ADDED
+
+CXXFLAGS += -I/usr/local/include/cppconn	#NEW ADDED
 
 
 AR       = ar cqs
