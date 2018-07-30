@@ -40,17 +40,19 @@ int DBConnector::connect() {
       driver = sql::mysql::get_driver_instance();
 
       /* Using the Driver to create a connection */
-  		boost::scoped_ptr< sql::Connection > con(driver->connect(url, userId, userPwd));
+  		//boost::scoped_ptr< sql::Connection > con(driver->connect(url, userId, userPwd));
+      con.reset(driver->connect (url, userId, userPwd)); // connect to mysql
+
   		con->setSchema(database);
 
   		boost::scoped_ptr< sql::Statement > stmt(con->createStatement());
-  		boost::scoped_ptr< sql::ResultSet > res(stmt->executeQuery("SELECT 'Welcome to Connector/C++' AS _message"));
+  		/*boost::scoped_ptr< sql::ResultSet > res(stmt->executeQuery("SELECT 'Welcome to Connector/C++' AS _message"));
   		cout << "\t... running 'SELECT 'Welcome to Connector/C++' AS _message'" << endl;
   		while (res->next()) {
   			cout << "\t... MySQL replies: " << res->getString("_message") << endl;
   			cout << "\t... say it again, MySQL" << endl;
   			cout << "\t....MySQL replies: " << res->getString(1) << endl;
-  		}
+  		}*/
 
   	} catch (sql::SQLException &e) {
   		/*
@@ -85,31 +87,21 @@ int DBConnector::connect() {
   	return EXIT_SUCCESS;
   }
 
-int DBConnector::writeInDB(int _idObs, int _idRepo, int _rate, double **dataWR){
+int DBConnector::writeRawInDB(int _idObs, int _idRepo, double _mjdferi, double _mjdferf, double *dataWR){
 
 
   int idObs = _idObs;
   int idRepo = _idRepo;
-  int rate = _rate;
+  double mjdferi = _mjdferi;
+  double mjdferf = _mjdferf;
   stringstream sql;
   stringstream msg;
   int num_rows;
   int status = 0;
 
 
-  /*cout << "\n\nINSIDE WRITEINDB\n"  << endl;
-  for (int i=0; i <rate; i++) {
-    for(int j=0; j <8; j++) {
-        cout << "(i="<<i<<" j="<<j<<") "<<dataWR[i][j] << endl;
-    }
-    cout << endl;
-  }*/
-
   try {
 
-    /* Using the Driver to create a connection */
-    driver = sql::mysql::get_driver_instance();
-		boost::scoped_ptr< sql::Connection > con(driver->connect(url, userId, userPwd));
 
     /* Creating a "simple" statement - "simple" = not a prepared statement */
 		boost::scoped_ptr< sql::Statement > stmt(con->createStatement());
@@ -133,42 +125,44 @@ int DBConnector::writeInDB(int _idObs, int _idRepo, int _rate, double **dataWR){
     //cout << "\n\nINSIDE WRITEINDB -> Preparing statement\n"  << endl;
 
 
-    for (int i = 0; i < rate; i++) {
-      //cout << "i: " << i << endl;
-      //cout << dataWR[i][0] << endl;
-      prep_stmt->setInt(1, (int)dataWR[i][0]);  // eventidfits
-      //cout << "idObs: "<< idObs << endl;
-      prep_stmt->setInt(2, idObs);  //observationid
-      //cout<< "idRepo: "<< idRepo << endl;
-      prep_stmt->setInt(3, idRepo);  //datarepositoryid
-      //cout << dataWR[i][2] << endl;
-      prep_stmt->setDouble(4, dataWR[i][1]);  //time
-      //cout << dataWR[i][3] << endl;
-      prep_stmt->setDouble(5, dataWR[i][2]); //ra_deg
-      //cout << dataWR[i][4] << endl;
-      prep_stmt->setDouble(6, dataWR[i][3]); //dec_deg
-      //cout << dataWR[i][5] << endl;
-      prep_stmt->setDouble(7, dataWR[i][4]); // energy
-      //cout << dataWR[i][6] << endl;
-      prep_stmt->setDouble(8, dataWR[i][5]); //detx
-      //cout << dataWR[i][7] << endl;
-      prep_stmt->setDouble(9, dataWR[i][6]);  //dety
-      //cout << dataWR[i][8] << endl;
-      prep_stmt->setInt(10, (int)dataWR[i][7]);  //mcid
-      prep_stmt->setInt(11, status); //status
-      prep_stmt->setDouble(12, 12); //timeraltt
-      prep_stmt->setInt(13, 13);  //insert_time
+        //rate
+        //cout << "i: " << i << endl;
+        //cout << dataWR[i][0] << endl;
+        prep_stmt->setInt(1, (int)dataWR[0]);  // eventidfits
+        //cout << "idObs: "<< idObs << endl;
+        prep_stmt->setInt(2, idObs);  //observationid
+        //cout<< "idRepo: "<< idRepo << endl;
+        prep_stmt->setInt(3, idRepo);  //datarepositoryid
+        //cout << dataWR[i][2] << endl;
+        prep_stmt->setDouble(4, 0);  //time dataWR[i][1]
+        //cout << dataWR[i][3] << endl;
+        prep_stmt->setDouble(5, dataWR[2]); //ra_deg
+        //cout << dataWR[i][4] << endl;
+        prep_stmt->setDouble(6, dataWR[3]); //dec_deg
+        //cout << dataWR[i][5] << endl;
+        prep_stmt->setDouble(7, dataWR[4]); // energy
+        //cout << dataWR[i][6] << endl;
+        prep_stmt->setDouble(8, dataWR[5]); //detx
+        //cout << dataWR[i][7] << endl;
+        prep_stmt->setDouble(9, dataWR[6]);  //dety
+        //cout << dataWR[i][8] << endl;
+        prep_stmt->setInt(10, (int)dataWR[7]);  //mcid
+        prep_stmt->setInt(11, status); //status
+        prep_stmt->setDouble(12, dataWR[1] * ( ( ( mjdferi + mjdferf ) - 53005.0 ) * 86400.0 ) ); //timeraltt
+        prep_stmt->setDateTime(13, stmt->execute("CURRENT_TIMESTAMP"));  //insert_time
 
-      /* executeUpdate() returns the number of affected = inserted rows */
-      num_rows += prep_stmt->executeUpdate();
-    }
+        /* executeUpdate() returns the number of affected = inserted rows */
+        num_rows += prep_stmt->executeUpdate();
+        //cout << "Num rows added: "<< num_rows << endl;
 
-  		if (EXAMPLE_NUM_TEST_ROWS != num_rows) {
+
+
+  		if (ONE_ROW != num_rows) {
   			msg.str("");
-  			msg << "Expecting " << EXAMPLE_NUM_TEST_ROWS << "rows, reported " << num_rows;
+  			msg << "Expecting " << ONE_ROW << "rows, reported " << num_rows;
   			throw runtime_error(msg.str());
   		}
-  		cout << "#\t Test table populated" << endl;
+  		//cout << "#\t Test table populated" << endl;
 
   }  catch (sql::SQLException &e) {
 		/*

@@ -20,6 +20,8 @@
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
+#include <chrono>
+#include <thread>
 
 #include <boost/scoped_ptr.hpp>
 
@@ -42,7 +44,7 @@
 //#define EXAMPLE_HOST "localhost"
 //#define EXAMPLE_USER "root"
 //#define EXAMPLE_PASS ""
-//#define EXAMPLE_DB "test"
+#define ONE_ROW 1
 
 using namespace std;
 
@@ -50,10 +52,12 @@ class DBConnector{
 public:
   DBConnector(int idObs,int idRepo, string userId, string userPwd);
   int connect();
-  int writeInDB(int _idObs, int _idRepo, int rate, double **data);
+  int writeRawInDB(int _idObs, int _idRepo, double _mjdferi, double _mjdferf, double *dataWR);
   int idObs;
   int idRepo;
   sql::Driver *driver;
+  boost::shared_ptr <sql::Connection> con;
+  //boost::shared_ptr< sql::Connection > con;
   string url;
   string userId;
   string userPwd;

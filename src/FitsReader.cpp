@@ -92,6 +92,37 @@ vector<string> FitsReader::getHDU(){
   return hdu;
 }
 
+double FitsReader::getMJDREFI(){
+  char comment[1024];
+
+  double value;
+
+  fits_read_key(fptr, TDOUBLE, "MJDREFI", &value, comment, &status);
+
+  //cout << "MJDREFI: " << value <<  endl;
+  //cout << "comment: " << comment << endl;
+  //cout << "status: " << status << endl;
+
+
+  return value;
+}
+
+double FitsReader::getMJDREFF(){
+
+  char comment[1024];
+
+  double value;
+
+  fits_read_key(fptr, TDOUBLE, "MJDREFF", &value, comment, &status);
+
+
+  //cout << "MJDREFF: " << value <<  endl;
+  //cout << "comment: " << comment << endl;
+  //cout << "status: " << status << endl;
+
+  return value;
+}
+
 //vector<double> FitsReader::getTable(){
 double ** FitsReader::getTable(){
 

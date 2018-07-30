@@ -16,6 +16,8 @@
 */
 #include<iostream>
 #include<vector>
+#include <chrono>
+#include <thread>
 
 #include"FitsReader.h"
 #include"DBConnector.h"
@@ -32,6 +34,8 @@ public:
   int idObs;
   int idRepo;
 	double rate;
+  long double mjdferi;
+  long double mjdferf;
 	string userId;
 	string userPwd;
   std::vector<string> hdu;

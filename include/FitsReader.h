@@ -33,6 +33,8 @@ public:
   int OpenFitsFile();
   long getNrows();
   int getNcols();
+  double getMJDREFI();
+  double getMJDREFF();
   std::vector <string> getHDU();
   //std::vector <double>  getTable();
   double ** getTable();

@@ -38,7 +38,7 @@ endif
 SYSTEM= $(shell gcc -dumpmachine)
 
 # Applications
-EXE = dl3Sim
+EXE = RTA-DL3-Sim
 
 ####### 2) Directories for the compiler
 OBJECTS_DIR = obj

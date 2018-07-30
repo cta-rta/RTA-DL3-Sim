@@ -46,40 +46,43 @@ EventDL3Handler::EventDL3Handler(const char* _fitsFileName, int _idObs, int _idR
   FitsReader fitsreader(fitsFileName);
   DBConnector dbConnector(idObs, idRepo, uId, uPwd);
 
-  //dbConnector.connect();
+  dbConnector.connect();
 
   fitsreader.OpenFitsFile();
 
   nrows = fitsreader.getNrows();
   ncols = fitsreader.getNcols();
 
+  long double mjdferi = fitsreader.getMJDREFI();
+  double mjdferf = fitsreader.getMJDREFF();
+  //cout << "mjdferi" << mjdferi << endl;
+  //cout << "mjdferf" << mjdferf << endl;
+
+
   hdu = fitsreader.getHDU();
 
   /*    PRINT HDU VALUES  */
-  for(std::vector<string>::iterator it = hdu.begin(); it != hdu.end(); ++it) {
+  /*for(std::vector<string>::iterator it = hdu.begin(); it != hdu.end(); ++it) {
 
     cout << *it << endl;
-  }
+  }*/
 
 
 
   double **table = fitsreader.getTable();
 
-  //int tmp = 0;
 
-  for (int jj = 0; jj < rate; jj++) {
-
-    for (int ii = 0; ii < ncols; ii++)
-      {
-
-        cout << table[jj][ii] << endl;
-
-      }
-      //getchar();
-  }
-
-  //tmp = rate;
-  dbConnector.writeInDB(idObs, idRepo, rate, table);
+  for(int i = 0 ; i < nrows; i += rate) {
 
 
+    for( int j=0 ; j < rate; j ++) {
+
+      dbConnector.writeRawInDB(idObs, idRepo, mjdferi, mjdferf, table[j+i]);
+
+    }
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+    }
+    //getchar();
 }
