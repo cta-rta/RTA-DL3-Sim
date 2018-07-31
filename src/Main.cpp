@@ -43,14 +43,15 @@ int main(int argc, char *argv[])
 
 	cout << startString << endl;
 
-	if(argc != 7) {
-		cout << "Insert 6 input parameters:\n"
+	if(argc != 8) {
+		cout << "Insert 7 input parameters:\n"
 		"1 - fitsFileNamePath: Input fits file path.\n"
-		"2 - idObs: \n"
-		"3 - idRepo: \n"
-		"4 - rate: How events per second insert in DB.\n"
-		"5 - userId: Input database user id.\n"
-		"6 - userPwd: Input database user password\n"
+		"2 - idObs: Insert observation id.\n"
+		"3 - idRepo: Insert Repository id.\n"
+		"4 - insertMode: Insert '0' to execute Batch insert mode, '1' to execute Transaction Batch insert mode, '2' to execute Streaming insert mode.\n"
+		"5 - rate: How events per second insert in DB.\n"
+		"6 - userId: Input database user id.\n"
+		"7 - userPwd: Input database user password\n"
 		 << endl;
 
 		cout << endString << endl;
@@ -60,21 +61,40 @@ int main(int argc, char *argv[])
   const char * fitsFileName = argv[1];
   int idObs = atoi(argv[2]);
   int idRepo = atoi(argv[3]);
-	double rate = atof(argv[4]);
-	const char * userId = argv[5];
-	const char * userPwd = argv[6];
+	int insertMode = atoi(argv[4]);
+	double rate = atof(argv[5]);
+	const char * userId = argv[6];
+	const char * userPwd = argv[7];
 
 	// PRINT INPUT PARAMETERS
 	cout << "\n	=====" << endl;
 	cout << "fitsFileNamePath: " << fitsFileName << endl;
 	cout << "idObs: " << idObs << endl;
 	cout << "idRepo: " << idRepo << endl;
+	cout << "insertMode: " << insertMode << endl;
 	cout << "rate: " << rate << endl;
 	cout << "userId: " << userId << endl;
 	cout << "\n	=====" << endl;
 
 	EventDL3Handler evtDL3Handler(fitsFileName, idObs, idRepo, rate, userId, userPwd);
-	evtDL3Handler.EventManager();
+	if ( insertMode == 0 ) {
+
+		evtDL3Handler.BatchEventManager();
+
+	} else if (insertMode == 1) {
+
+		evtDL3Handler.TransactionBatchEventManager();
+
+
+	} else if (insertMode == 2) {
+
+		evtDL3Handler.StreamingEventManager();
+
+	} else if ( insertMode != 0 || insertMode != 1 || insertMode != 2) {
+
+		cout << "ERROR: INSERT MODE PARAMETER! " << endl;
+
+	}
 
 
 

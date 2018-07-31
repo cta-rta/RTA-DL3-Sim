@@ -40,9 +40,9 @@ EventDL3Handler::EventDL3Handler(const char* _fitsFileName, int _idObs, int _idR
   //EventManager();
 }
 
-int EventDL3Handler::EventManager() {
+int EventDL3Handler::BatchEventManager() {
 
-  //cout << "EventManager" << endl;
+  cout << "BatchEventManager" << endl;
 
   int nrows = 0;
   int ncols = 0;
@@ -60,11 +60,62 @@ int EventDL3Handler::EventManager() {
   nrows = fitsreader.getNrows();
   ncols = fitsreader.getNcols();
 
-  long double mjdferi = fitsreader.getMJDREFI();
-  double mjdferf = fitsreader.getMJDREFF();
-  //cout << "mjdferi" << mjdferi << endl;
-  //cout << "mjdferf" << mjdferf << endl;
+    hdu = fitsreader.getHDU();
 
+  /*    PRINT HDU VALUES  */
+  /*for(std::vector<string>::iterator it = hdu.begin(); it != hdu.end(); ++it) {
+
+    cout << *it << endl;
+  }*/
+
+
+  /* fitsReader.getTable restituisce un array 2D double con un time per ogni evento espresso in terrestrial time */
+  double **table = fitsreader.getTable();
+
+
+  for(int i = 0 ; i < nrows; i += rate) {
+
+    auto start = std::chrono::system_clock::now();
+
+    for( int j=0 ; j < rate; j ++) {
+
+      dbConnector.writeRowInDB(idObs, idRepo, table[j+i]);
+
+    }
+
+    auto stop = std::chrono::system_clock::now();
+
+    std::chrono::duration<double> diff = stop-start;
+
+    cout << "Tempo impiegato per inserire " << rate << " eventi = " << diff.count() << " ms" << endl;
+
+    sleep(1);
+
+    }
+
+    return 0;
+}
+
+
+int EventDL3Handler::TransactionBatchEventManager() {
+
+  cout << "TransactionBatchEventManager" << endl;
+
+  int nrows = 0;
+  int ncols = 0;
+
+  string uId(userId);
+  string uPwd(userPwd);
+
+  FitsReader fitsreader(fitsFileName);
+  DBConnector dbConnector(idObs, idRepo, uId, uPwd);
+
+  dbConnector.connect();
+
+  fitsreader.OpenFitsFile();
+
+  nrows = fitsreader.getNrows();
+  ncols = fitsreader.getNcols();
 
   hdu = fitsreader.getHDU();
 
@@ -74,36 +125,83 @@ int EventDL3Handler::EventManager() {
     cout << *it << endl;
   }*/
 
-
-
   double **table = fitsreader.getTable();
-
 
   for(int i = 0 ; i < nrows; i += rate) {
 
-
-
     auto start = std::chrono::system_clock::now();
-
 
     for( int j=0 ; j < rate; j ++) {
 
-      dbConnector.writeRowInDB(idObs, idRepo, mjdferi, mjdferf, table[j+i]);
+      dbConnector.writeRowInDB(idObs, idRepo, table[j+i]);
 
     }
-
 
     auto stop = std::chrono::system_clock::now();
+
     std::chrono::duration<double> diff = stop-start;
 
+    cout << "Tempo impiegato per inserire " << rate << " eventi = " << diff.count() << " ms" << endl;
 
-    cout << "Tempo impiegato per inserire " << rate << " eventi = " << diff.count() << endl;
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    sleep(1);
 
 
     }
-    //getchar();
 
     return 0;
+
+}
+
+
+int EventDL3Handler::StreamingEventManager() {
+
+  cout << "StreamingEventManager" << endl;
+
+  int nrows = 0;
+  int ncols = 0;
+
+  string uId(userId);
+  string uPwd(userPwd);
+
+  FitsReader fitsreader(fitsFileName);
+  DBConnector dbConnector(idObs, idRepo, uId, uPwd);
+
+  dbConnector.connect();
+
+  fitsreader.OpenFitsFile();
+
+  nrows = fitsreader.getNrows();
+  ncols = fitsreader.getNcols();
+
+  hdu = fitsreader.getHDU();
+
+  /*    PRINT HDU VALUES  */
+  /*for(std::vector<string>::iterator it = hdu.begin(); it != hdu.end(); ++it) {
+
+    cout << *it << endl;
+  }*/
+
+  double **table = fitsreader.getTable();
+
+  for(int i = 0 ; i < nrows; i += rate) {
+
+    auto start = std::chrono::system_clock::now();
+
+    for( int j=0 ; j < rate; j ++) {
+
+      dbConnector.writeRowInDB(idObs, idRepo, table[j+i]);
+      sleep(1/rate);
+
+    }
+
+    auto stop = std::chrono::system_clock::now();
+
+    std::chrono::duration<double> diff = stop-start;
+
+    cout << "Tempo impiegato per inserire " << rate << " eventi = " << diff.count() << " ms" << endl;
+
+    }
+
+    return 0;
+
 }

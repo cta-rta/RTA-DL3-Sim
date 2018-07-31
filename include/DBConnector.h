@@ -55,7 +55,8 @@ class DBConnector{
 public:
   DBConnector(int idObs,int idRepo, string userId, string userPwd);
   int connect();
-  int writeRowInDB(int _idObs, int _idRepo, double _mjdferi, double _mjdferf, double *dataWR);
+  int writeRowInDB(int idObs, int idRepo, double *dataWR);
+  int writeTransactionInDB(int idObs, int idRepo, double *dataWR);
   int idObs;
   int idRepo;
   sql::Driver *driver;

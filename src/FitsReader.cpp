@@ -166,7 +166,7 @@ double ** FitsReader::getTable(){
       //getchar();
   }
 
-    //fits_close_file(fptr, &status);
+    fits_close_file(fptr, &status);
 
   return table;
 }
