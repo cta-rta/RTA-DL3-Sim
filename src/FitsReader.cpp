@@ -95,32 +95,40 @@ vector<string> FitsReader::getHDU(){
 double FitsReader::getMJDREFI(){
   char comment[1024];
 
-  double value;
+  //double value;
 
-  fits_read_key(fptr, TDOUBLE, "MJDREFI", &value, comment, &status);
+  //fits_read_key(fptr, TDOUBLE, "MJDREFI", &value, comment, &status);
+  fits_read_key(fptr, TDOUBLE, "MJDREFI", &mjdferi, comment, &status);
 
   //cout << "MJDREFI: " << value <<  endl;
   //cout << "comment: " << comment << endl;
   //cout << "status: " << status << endl;
+  //mjdferi = value;
 
 
-  return value;
+
+  //return value;
+  return mjdferi;
 }
 
 double FitsReader::getMJDREFF(){
 
   char comment[1024];
 
-  double value;
+  //double value;
 
-  fits_read_key(fptr, TDOUBLE, "MJDREFF", &value, comment, &status);
+  //fits_read_key(fptr, TDOUBLE, "MJDREFF", &value, comment, &status);
+  fits_read_key(fptr, TDOUBLE, "MJDREFF", &mjdferf, comment, &status);
 
 
   //cout << "MJDREFF: " << value <<  endl;
   //cout << "comment: " << comment << endl;
   //cout << "status: " << status << endl;
 
-  return value;
+  //mjdferf = value;
+
+  //return value;
+  return mjdferf;
 }
 
 //vector<double> FitsReader::getTable(){
@@ -145,11 +153,14 @@ double ** FitsReader::getTable(){
             break;
           }
           //cout << jj << " " << ii << endl;
-          table[jj-1][ii-1] = value[ii-1];
+          if(ii-1 == 1) {
+            table[jj-1][ii-1] = value[ii-1] + ( ( ( mjdferi + mjdferf ) - 53005.0 ) * 86400.0 );
+          }else {
+            table[jj-1][ii-1] = value[ii-1];
+          }
 
           //cout << "value " << ii << " "<< jj<<": " << table[jj][ii] << endl;
-          //table.push_back(value[ii]);
-          //cout << "Pushato " << ii <<"-esimo elemento" << endl;
+
       }
 
       //getchar();

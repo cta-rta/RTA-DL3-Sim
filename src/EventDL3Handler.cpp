@@ -20,7 +20,7 @@
 EventDL3Handler::EventDL3Handler(const char* _fitsFileName, int _idObs, int _idRepo, double _rate, const char * _userId, const char * _userPwd){
 
 
-  const char * fitsFileName = _fitsFileName;
+  fitsFileName = _fitsFileName;
   idObs = _idObs;
   idRepo = _idRepo;
   rate = _rate;
@@ -36,6 +36,13 @@ EventDL3Handler::EventDL3Handler(const char* _fitsFileName, int _idObs, int _idR
   cout << "userId: " << userId << endl;
   cout << "userPwd: " << userPwd << endl;
 */
+
+  //EventManager();
+}
+
+int EventDL3Handler::EventManager() {
+
+  //cout << "EventManager" << endl;
 
   int nrows = 0;
   int ncols = 0;
@@ -75,14 +82,28 @@ EventDL3Handler::EventDL3Handler(const char* _fitsFileName, int _idObs, int _idR
   for(int i = 0 ; i < nrows; i += rate) {
 
 
+
+    auto start = std::chrono::system_clock::now();
+
+
     for( int j=0 ; j < rate; j ++) {
 
-      dbConnector.writeRawInDB(idObs, idRepo, mjdferi, mjdferf, table[j+i]);
+      dbConnector.writeRowInDB(idObs, idRepo, mjdferi, mjdferf, table[j+i]);
 
     }
+
+
+    auto stop = std::chrono::system_clock::now();
+    std::chrono::duration<double> diff = stop-start;
+
+
+    cout << "Tempo impiegato per inserire " << rate << " eventi = " << diff.count() << endl;
 
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
+
     }
     //getchar();
+
+    return 0;
 }

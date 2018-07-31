@@ -40,19 +40,12 @@ int DBConnector::connect() {
       driver = sql::mysql::get_driver_instance();
 
       /* Using the Driver to create a connection */
-  		//boost::scoped_ptr< sql::Connection > con(driver->connect(url, userId, userPwd));
-      con.reset(driver->connect (url, userId, userPwd)); // connect to mysql
+  		con.reset(driver->connect (url, userId, userPwd)); // connect to mysql
 
   		con->setSchema(database);
 
   		boost::scoped_ptr< sql::Statement > stmt(con->createStatement());
-  		/*boost::scoped_ptr< sql::ResultSet > res(stmt->executeQuery("SELECT 'Welcome to Connector/C++' AS _message"));
-  		cout << "\t... running 'SELECT 'Welcome to Connector/C++' AS _message'" << endl;
-  		while (res->next()) {
-  			cout << "\t... MySQL replies: " << res->getString("_message") << endl;
-  			cout << "\t... say it again, MySQL" << endl;
-  			cout << "\t....MySQL replies: " << res->getString(1) << endl;
-  		}*/
+
 
   	} catch (sql::SQLException &e) {
   		/*
@@ -60,8 +53,8 @@ int DBConnector::connect() {
 
   		- sql::MethodNotImplementedException (derived from sql::SQLException)
   		- sql::InvalidArgumentException (derived from sql::SQLException)
-  		- sql::SQLException (derived from std::runtime_error)
-  		*/
+  		- sql::SQLException (derived from std::runtime_error)#include <chrono>
+  		*/#include <chrono>
   		cout << "# ERR: SQLException in " << __FILE__;
   		cout << "(" << EXAMPLE_FUNCTION << ") on line " << __LINE__ << endl;
   		/* Use what() (derived from std::runtime_error) to fetch the error message */
@@ -87,7 +80,7 @@ int DBConnector::connect() {
   	return EXIT_SUCCESS;
   }
 
-int DBConnector::writeRawInDB(int _idObs, int _idRepo, double _mjdferi, double _mjdferf, double *dataWR){
+int DBConnector::writeRowInDB(int _idObs, int _idRepo, double _mjdferi, double _mjdferf, double *dataWR){
 
 
   int idObs = _idObs;
@@ -125,35 +118,37 @@ int DBConnector::writeRawInDB(int _idObs, int _idRepo, double _mjdferi, double _
     //cout << "\n\nINSIDE WRITEINDB -> Preparing statement\n"  << endl;
 
 
-        //rate
-        //cout << "i: " << i << endl;
-        //cout << dataWR[i][0] << endl;
-        prep_stmt->setInt(1, (int)dataWR[0]);  // eventidfits
-        //cout << "idObs: "<< idObs << endl;
-        prep_stmt->setInt(2, idObs);  //observationid
-        //cout<< "idRepo: "<< idRepo << endl;
-        prep_stmt->setInt(3, idRepo);  //datarepositoryid
-        //cout << dataWR[i][2] << endl;
-        prep_stmt->setDouble(4, 0);  //time dataWR[i][1]
-        //cout << dataWR[i][3] << endl;
-        prep_stmt->setDouble(5, dataWR[2]); //ra_deg
-        //cout << dataWR[i][4] << endl;
-        prep_stmt->setDouble(6, dataWR[3]); //dec_deg
-        //cout << dataWR[i][5] << endl;
-        prep_stmt->setDouble(7, dataWR[4]); // energy
-        //cout << dataWR[i][6] << endl;
-        prep_stmt->setDouble(8, dataWR[5]); //detx
-        //cout << dataWR[i][7] << endl;
-        prep_stmt->setDouble(9, dataWR[6]);  //dety
-        //cout << dataWR[i][8] << endl;
-        prep_stmt->setInt(10, (int)dataWR[7]);  //mcid
-        prep_stmt->setInt(11, status); //status
-        prep_stmt->setDouble(12, dataWR[1] * ( ( ( mjdferi + mjdferf ) - 53005.0 ) * 86400.0 ) ); //timeraltt
-        prep_stmt->setDateTime(13, stmt->execute("CURRENT_TIMESTAMP"));  //insert_time
+    //rate
+    //cout << "i: " << i << endl;
+    //cout << dataWR[i][0] << endl;
+    prep_stmt->setInt(1, (int)dataWR[0]);  // eventidfits
+    //cout << "idObs: "<< idObs << endl;
+    prep_stmt->setInt(2, idObs);  //observationid
+    //cout<< "idRepo: "<< idRepo << endl;
+    prep_stmt->setInt(3, idRepo);  //datarepositoryid
+    //cout << dataWR[i][2] << endl;
+    prep_stmt->setDouble(4, 0);  //time dataWR[i][1]
+    //cout << dataWR[i][3] << endl;
+    prep_stmt->setDouble(5, dataWR[2]); //ra_deg
+    //cout << dataWR[i][4] << endl;
+    prep_stmt->setDouble(6, dataWR[3]); //dec_deg
+    //cout << dataWR[i][5] << endl;
+    prep_stmt->setDouble(7, dataWR[4]); // energy
+    //cout << dataWR[i][6] << endl;
+    prep_stmt->setDouble(8, dataWR[5]); //detx
+    //cout << dataWR[i][7] << endl;
+    prep_stmt->setDouble(9, dataWR[6]);  //dety
+    //cout << dataWR[i][8] << endl;
+    prep_stmt->setInt(10, (int)dataWR[7]);  //mcid
+    prep_stmt->setInt(11, status); //status
+    prep_stmt->setDouble(12, dataWR[1] ); //timeraltt
+    prep_stmt->setDouble(13, time(&timer));
 
-        /* executeUpdate() returns the number of affected = inserted rows */
-        num_rows += prep_stmt->executeUpdate();
-        //cout << "Num rows added: "<< num_rows << endl;
+
+
+    /* executeUpdate() returns the number of affected = inserted rows */
+    num_rows += prep_stmt->executeUpdate();
+    //cout << "Num rows added: "<< num_rows << endl;
 
 
 

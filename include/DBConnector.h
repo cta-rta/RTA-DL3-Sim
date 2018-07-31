@@ -35,6 +35,8 @@
 #include "mysql_driver.h"
 #include "examples.h"
 
+#include <chrono>
+#include <sys/time.h>
 #include <cppconn/driver.h>
 #include <cppconn/exception.h>
 #include <cppconn/resultset.h>
@@ -48,16 +50,17 @@
 
 using namespace std;
 
+
 class DBConnector{
 public:
   DBConnector(int idObs,int idRepo, string userId, string userPwd);
   int connect();
-  int writeRawInDB(int _idObs, int _idRepo, double _mjdferi, double _mjdferf, double *dataWR);
+  int writeRowInDB(int _idObs, int _idRepo, double _mjdferi, double _mjdferf, double *dataWR);
   int idObs;
   int idRepo;
   sql::Driver *driver;
   boost::shared_ptr <sql::Connection> con;
-  //boost::shared_ptr< sql::Connection > con;
+  time_t timer;
   string url;
   string userId;
   string userPwd;

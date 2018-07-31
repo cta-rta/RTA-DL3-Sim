@@ -74,6 +74,7 @@ int main(int argc, char *argv[])
 	cout << "\n	=====" << endl;
 
 	EventDL3Handler evtDL3Handler(fitsFileName, idObs, idRepo, rate, userId, userPwd);
+	evtDL3Handler.EventManager();
 
 
 

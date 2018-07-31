@@ -35,8 +35,9 @@ public:
   int getNcols();
   double getMJDREFI();
   double getMJDREFF();
+  double mjdferi;
+  double mjdferf;
   std::vector <string> getHDU();
-  //std::vector <double>  getTable();
   double ** getTable();
 
   const char * fitsFileName;
