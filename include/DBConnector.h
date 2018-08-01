@@ -26,17 +26,14 @@
 #include <boost/scoped_ptr.hpp>
 
 
-/*
-  Include directly the different
-  headers from cppconn/ and mysql_driver.h + mysql_util.h
-  (and mysql_connection.h). This will reduce your build time!
-*/
 #include "mysql_connection.h"
 #include "mysql_driver.h"
 #include "examples.h"
+#include "FileWriter.h"
 
 #include <chrono>
 #include <sys/time.h>
+#include <sstream>
 #include <cppconn/driver.h>
 #include <cppconn/exception.h>
 #include <cppconn/resultset.h>
@@ -53,10 +50,15 @@ using namespace std;
 
 class DBConnector{
 public:
-  DBConnector(int idObs,int idRepo, string userId, string userPwd);
+  DBConnector(int _idObs, int _idRepo, string _host, string _userId, string _userPwd, string _dbName, string _tbName);
   int connect();
   int writeRowInDB(int idObs, int idRepo, double *dataWR);
   int writeTransactionInDB(int idObs, int idRepo, double *dataWR);
+  int writeRowInDBByString(int idObs, int idRepo, double *dataWR);
+  int writeRowInDBByFprintf(int idObs, int idRepo, double *dataWR);
+  int writeTransactionInDBByString(int idObs, int idRepo, double *dataWR);
+  int startTransaction();
+  int commitTransaction();
   int idObs;
   int idRepo;
   sql::Driver *driver;
@@ -65,7 +67,9 @@ public:
   string url;
   string userId;
   string userPwd;
-  string database="evt_test";
+  string dbName;
+  string tbName;
+
 
 private:
 };

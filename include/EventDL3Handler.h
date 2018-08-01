@@ -28,15 +28,20 @@ using std::endl;
 
 class EventDL3Handler {
 public:
-  EventDL3Handler(const char * fitsFileNamePath, int idObs, int idRepo, double rate, const char * userId, const char * userPwd);
+  EventDL3Handler(const char* _fitsFileName, int _idObs, int _idRepo, double _rate, const char * _host, const char * _userId, const char * _userPwd,   const char * _dbName, const char * _tbName);
   int BatchEventManager();
   int TransactionBatchEventManager();
+  int TransactionBatchEventManagerByString();
   int StreamingEventManager();
+  int StreamingEventManagerString();
 
   const char * fitsFileName;
   int idObs;
   int idRepo;
 	long int rate;
+  const char * host;
+  const char * dbName;
+  const char * tbName;
   long double mjdferi;
   long double mjdferf;
 	string userId;

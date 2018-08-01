@@ -17,15 +17,18 @@
 
 #include"EventDL3Handler.h"
 
-EventDL3Handler::EventDL3Handler(const char* _fitsFileName, int _idObs, int _idRepo, double _rate, const char * _userId, const char * _userPwd){
+EventDL3Handler::EventDL3Handler(const char* _fitsFileName, int _idObs, int _idRepo, double _rate, const char * _host, const char * _userId, const char * _userPwd,   const char * _dbName, const char * _tbName){
 
 
   fitsFileName = _fitsFileName;
   idObs = _idObs;
   idRepo = _idRepo;
   rate = _rate;
+  host = _host;
   userId = _userId;
   userPwd = _userPwd;
+  dbName = _dbName;
+  tbName = _tbName;
 
 /*
   cout << "EventDL3HandlerConstructor" << endl;
@@ -47,20 +50,21 @@ int EventDL3Handler::BatchEventManager() {
   int nrows = 0;
   int ncols = 0;
 
+  string hst(host);
   string uId(userId);
   string uPwd(userPwd);
+  string dbN(dbName);
+  string tbN(tbName);
 
   FitsReader fitsreader(fitsFileName);
-  DBConnector dbConnector(idObs, idRepo, uId, uPwd);
-
-  dbConnector.connect();
+  DBConnector dbConnector(idObs, idRepo, hst, uId, uPwd, dbN, tbN);
 
   fitsreader.OpenFitsFile();
 
   nrows = fitsreader.getNrows();
   ncols = fitsreader.getNcols();
 
-    hdu = fitsreader.getHDU();
+  hdu = fitsreader.getHDU();
 
   /*    PRINT HDU VALUES  */
   /*for(std::vector<string>::iterator it = hdu.begin(); it != hdu.end(); ++it) {
@@ -72,6 +76,7 @@ int EventDL3Handler::BatchEventManager() {
   /* fitsReader.getTable restituisce un array 2D double con un time per ogni evento espresso in terrestrial time */
   double **table = fitsreader.getTable();
 
+  dbConnector.connect();
 
   for(int i = 0 ; i < nrows; i += rate) {
 
@@ -79,7 +84,8 @@ int EventDL3Handler::BatchEventManager() {
 
     for( int j=0 ; j < rate; j ++) {
 
-      dbConnector.writeRowInDB(idObs, idRepo, table[j+i]);
+      //dbConnector.writeRowInDB(idObs, idRepo, table[j+i]);
+      dbConnector.writeRowInDBByString(idObs, idRepo, table[j+i]);
 
     }
 
@@ -104,17 +110,19 @@ int EventDL3Handler::TransactionBatchEventManager() {
   int nrows = 0;
   int ncols = 0;
 
+  string hst(host);
   string uId(userId);
   string uPwd(userPwd);
+  string dbN(dbName);
+  string tbN(tbName);
 
   FitsReader fitsreader(fitsFileName);
-  DBConnector dbConnector(idObs, idRepo, uId, uPwd);
-
-  dbConnector.connect();
+  DBConnector dbConnector(idObs, idRepo, hst, uId, uPwd, dbN, tbN);
 
   fitsreader.OpenFitsFile();
 
   nrows = fitsreader.getNrows();
+
   ncols = fitsreader.getNcols();
 
   hdu = fitsreader.getHDU();
@@ -125,17 +133,24 @@ int EventDL3Handler::TransactionBatchEventManager() {
     cout << *it << endl;
   }*/
 
+  /* fitsReader.getTable restituisce un array 2D double con un time per ogni evento espresso in terrestrial time */
   double **table = fitsreader.getTable();
+
+  dbConnector.connect();
 
   for(int i = 0 ; i < nrows; i += rate) {
 
     auto start = std::chrono::system_clock::now();
 
+    dbConnector.startTransaction();
+
     for( int j=0 ; j < rate; j ++) {
 
-      dbConnector.writeRowInDB(idObs, idRepo, table[j+i]);
+      dbConnector.writeTransactionInDBByString(idObs, idRepo, table[j+i]);
 
     }
+
+    dbConnector.commitTransaction();
 
     auto stop = std::chrono::system_clock::now();
 
@@ -160,13 +175,14 @@ int EventDL3Handler::StreamingEventManager() {
   int nrows = 0;
   int ncols = 0;
 
+  string hst(host);
   string uId(userId);
   string uPwd(userPwd);
+  string dbN(dbName);
+  string tbN(tbName);
 
   FitsReader fitsreader(fitsFileName);
-  DBConnector dbConnector(idObs, idRepo, uId, uPwd);
-
-  dbConnector.connect();
+  DBConnector dbConnector(idObs, idRepo, hst, uId, uPwd, dbN, tbN);
 
   fitsreader.OpenFitsFile();
 
@@ -181,7 +197,10 @@ int EventDL3Handler::StreamingEventManager() {
     cout << *it << endl;
   }*/
 
+  /* fitsReader.getTable restituisce un array 2D double con un time per ogni evento espresso in terrestrial time */
   double **table = fitsreader.getTable();
+
+  dbConnector.connect();
 
   for(int i = 0 ; i < nrows; i += rate) {
 
@@ -189,7 +208,8 @@ int EventDL3Handler::StreamingEventManager() {
 
     for( int j=0 ; j < rate; j ++) {
 
-      dbConnector.writeRowInDB(idObs, idRepo, table[j+i]);
+      dbConnector.writeRowInDBByString(idObs, idRepo, table[j+i]);
+
       sleep(1/rate);
 
     }

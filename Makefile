@@ -21,9 +21,9 @@
 
 SHELL = /bin/sh
 
-#ifndef RTALIB
-#$(error RTALIB is not set.)
-#endif
+ifndef RTALIB
+$(error RTALIB is not set.)
+endif
 ifndef CFITSIO
 $(error CFITSIO is not set.)
 endif

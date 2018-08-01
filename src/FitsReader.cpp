@@ -94,53 +94,41 @@ vector<string> FitsReader::getHDU(){
 
 double FitsReader::getMJDREFI(){
   char comment[1024];
+  double value;
 
-  //double value;
 
-  //fits_read_key(fptr, TDOUBLE, "MJDREFI", &value, comment, &status);
-  fits_read_key(fptr, TDOUBLE, "MJDREFI", &mjdferi, comment, &status);
+  fits_read_key(fptr, TDOUBLE, "MJDREFI", &value, comment, &status);
 
-  //cout << "MJDREFI: " << value <<  endl;
+  //cout << "MJDREFI: " << mjdferi <<  endl;
   //cout << "comment: " << comment << endl;
   //cout << "status: " << status << endl;
-  //mjdferi = value;
 
-
-
-  //return value;
-  return mjdferi;
+  return value;
 }
 
 double FitsReader::getMJDREFF(){
 
   char comment[1024];
+  double value;
 
-  //double value;
+  fits_read_key(fptr, TDOUBLE, "MJDREFF", &value, comment, &status);
 
-  //fits_read_key(fptr, TDOUBLE, "MJDREFF", &value, comment, &status);
-  fits_read_key(fptr, TDOUBLE, "MJDREFF", &mjdferf, comment, &status);
-
-
-  //cout << "MJDREFF: " << value <<  endl;
+  //cout << "MJDREFF: " << mjdferf <<  endl;
   //cout << "comment: " << comment << endl;
   //cout << "status: " << status << endl;
 
-  //mjdferf = value;
-
-  //return value;
-  return mjdferf;
+  return value;
 }
 
-//vector<double> FitsReader::getTable(){
+
 double ** FitsReader::getTable(){
 
 
-  //cout << "ncols: " << ncols << endl;
   double value[ncols];
+  mjdferi = getMJDREFI();
+  mjdferf = getMJDREFF();
 
   double** table = new double*[nrows];
-
-
 
   for (jj = 1; jj <= nrows && !status; jj++) {
 
