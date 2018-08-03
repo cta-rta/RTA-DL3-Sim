@@ -101,6 +101,119 @@ int DBConnector::commitTransaction(){
 
 }
 
+vector<string> DBConnector::queryConstructor(string tbName, int nrows, double **data){
+
+  string insertQueriesArray[nrows];
+  vector<string> allQueries;
+  double **dataWR = data;
+  int status = 0;
+
+  cout << "\nQuery construnction ..." << endl;
+
+  time_t seconds;
+  seconds = time(NULL);
+
+  for(int i = 0 ; i < nrows; i ++) {
+
+  insertQueriesArray[i] = "INSERT INTO " + tbName + "(eventidfits, observationid, datarepositoryid, ra_deg, dec_deg, energy, detx, dety, mcid, status, timerealtt, insert_time) VALUES ("
+
+  	    + FileWriter::convertToString(dataWR[i][0]) + " ,"
+
+  	    + FileWriter::convertToString( idObs ) + " , "
+
+  	    + FileWriter::convertToString( idRepo ) + " ,"
+
+  	    + FileWriter::convertToString( dataWR[i][2] ) + " ,"
+
+  	    + FileWriter::convertToString( dataWR[i][3] ) + ", "
+
+  	    + FileWriter::convertToString( dataWR[i][4] ) + " , "
+
+  	    + FileWriter::convertToString( dataWR[i][5] ) + " ,"
+
+  	    + FileWriter::convertToString( dataWR[i][6] ) + " ,"
+
+  	    + FileWriter::convertToString( dataWR[i][7] ) + " ,"
+
+  	    + FileWriter::convertToString( status ) + " , "
+
+  	    + FileWriter::convertToString( dataWR[i][1] ) + " , "
+
+        + FileWriter::convertToString( seconds ) + ")";
+
+        allQueries.push_back(insertQueriesArray[i]);
+
+  }
+
+  cout << "All queries are constructed." << endl;
+
+  return allQueries;
+}
+
+
+int DBConnector::writeRowInDBExtQuery(string query){
+
+  stringstream sql;
+  stringstream msg;
+  int num_rows = 0;
+
+  string qr = query;
+
+  try {
+
+      boost::scoped_ptr< sql::Statement > stmt(con->createStatement());
+
+      /* executeUpdate() returns the number of affected = inserted rows */
+      num_rows += stmt->executeUpdate(qr);
+
+
+      if (ONE_ROW != num_rows) {
+        msg.str("");
+        msg << "Expecting " << ONE_ROW << "rows, reported " << num_rows;
+        throw runtime_error(msg.str());
+      }
+
+
+    } catch (sql::SQLException &e) {
+      /*
+      The MySQL Connector/C++ throws three different exceptions:
+
+      - sql::MethodNotImplementedException (derived from sql::SQLException)
+      - sql::InvalidArgumentException (derived from sql::SQLException)
+      - sql::SQLException (derived from std::runtime_error)
+      */
+      cout << endl;
+      cout << "# ERR: DbcException in " << __FILE__;
+      cout << "(" << EXAMPLE_FUNCTION << ") on line " << __LINE__ << endl;
+      /* Use what(), getErrorCode() and getSQLState() */
+      cout << "# ERR: " << e.what();
+      cout << " (MySQL error code: " << e.getErrorCode();
+      cout << ", SQLState: " << e.getSQLState() << " )" << endl;
+
+      if (e.getErrorCode() == 1047) {
+        /*
+        Error: 1047 SQLSTATE: 08S01 (ER_UNKNOWN_COM_ERROR)
+        Message: Unknown command
+        */
+        cout << "# ERR: Your server seems not to support PS at all because its MYSQL <4.1" << endl;
+      }
+      cout << "not ok 1 - RTA-DL3-Sim/DBConnector.cpp" << endl;
+
+      return EXIT_FAILURE;
+    } catch (std::runtime_error &e) {
+
+      cout << endl;
+      cout << "# ERR: runtime_error in " << __FILE__;
+      cout << "(" << EXAMPLE_FUNCTION << ") on line " << __LINE__ << endl;
+      cout << "# ERR: " << e.what() << endl;
+      cout << "not ok 1 - RTA-DL3-Sim/DBConnector.cpp" << endl;
+
+      return EXIT_FAILURE;
+    }
+
+}
+
+
 
 int DBConnector::writeRowInDBByString(int idObs, int idRepo, double *dataWR){
 
@@ -114,7 +227,7 @@ int DBConnector::writeRowInDBByString(int idObs, int idRepo, double *dataWR){
   try {
 
 
-    /* Creating a PreparedStatement */
+    /* Creating a simple Statement */
     boost::scoped_ptr< sql::Statement > stmt(con->createStatement());
 
     time_t seconds;
@@ -202,42 +315,36 @@ int DBConnector::writeRowInDBByString(int idObs, int idRepo, double *dataWR){
 }
 
 
-/*    NON FUNZIONANTE */
-int DBConnector::writeRowInDBByFprintf(int idObs, int idRepo, double *dataWR){
+int DBConnector::writeRowInDBBySprintf(int idObs, int idRepo, double *dataWR){
 
   stringstream sql;
-  //fprintf insert;
   stringstream msg;
+  char * tbN = new char [tbName.length()+1];
+  strcpy (tbN, tbName.c_str());
   int num_rows = 0;
   int status = 0;
-  //FileWriter fw;
+  char query[QUERY_SIZE];
 
 
   try {
 
+    memset(query, 0, QUERY_SIZE);
 
-    /* Creating a PreparedStatement */
-    //boost::scoped_ptr< sql::PreparedStatement >  prep_stmt;
+
+
+    /* Creating a simple Statement */
     boost::scoped_ptr< sql::Statement > stmt(con->createStatement());
-
-    FILE * pFile;
-
-    pFile = fopen ("localhost/evt_test/evt/","r+");
-
-
-
-    //prep_stmt.reset(con->prepareStatement("INSERT INTO evt(eventidfits, observationid, datarepositoryid, ra_deg, dec_deg, energy, detx, dety, mcid, status, timerealtt, insert_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"));
 
     time_t seconds;
     seconds = time(NULL);
+    int fitsId = dataWR[0];
 
+    sprintf(query, "INSERT INTO %s(eventidfits, observationid, datarepositoryid, ra_deg, dec_deg, energy, detx, dety, mcid, status, timerealtt, insert_time) VALUES ( %d, %d, %d, %f, %f, %f, %f, %f, %d, %d, %f, %d )", tbN, fitsId, idObs, idRepo, dataWR[2], dataWR[3], dataWR[4], dataWR[5], dataWR[6], dataWR[7], status, dataWR[1], seconds);
 
-    //fprintf(pFile,"INSERT INTO  %s",tbName,"(eventidfits, observationid, datarepositoryid, ra_deg, dec_deg, energy, detx, dety, mcid, status, timerealtt, insert_time) VALUES (%d , %d, %f, %f, %f, %f, %f, %d, %d %f,%d )",dataWR[0], idObs, idRepo, dataWR[2], dataWR[3], dataWR[4], dataWR[5], dataWR[6], dataWR[7], status, dataWR[1], seconds);
+    //cout << query << endl;
 
-    //stmt->execute(insert);
     /* executeUpdate() returns the number of affected = inserted rows */
-    //num_rows += stmt->executeUpdate(fprintf(stmt(con->createStatement(),"INSERT INTO  %s",tbName,"(eventidfits, observationid, datarepositoryid, ra_deg, dec_deg, energy, detx, dety, mcid, status, timerealtt, insert_time) VALUES (",dataWR[0]," , ",idObs, ", ",idRepo," ,",dataWR[2]," ,",dataWR[3]," ,",dataWR[4],", ",dataWR[5]," , ",dataWR[6]," , ",dataWR[7]," , ",status," , ",dataWR[1]," ,",seconds,")"));
-    //num_rows += stmt->executeUpdate();
+    num_rows += stmt->executeUpdate(query);
 
 
   	if (ONE_ROW != num_rows) {

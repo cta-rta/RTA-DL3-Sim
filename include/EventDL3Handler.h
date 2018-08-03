@@ -30,10 +30,16 @@ class EventDL3Handler {
 public:
   EventDL3Handler(const char* _fitsFileName, int _idObs, int _idRepo, double _rate, const char * _host, const char * _userId, const char * _userPwd,   const char * _dbName, const char * _tbName);
   int BatchEventManager();
+  int BatchEventManagerExtQuery();
+  int BatchEventManagerBySprintf();
   int TransactionBatchEventManager();
   int TransactionBatchEventManagerByString();
+  int TransactionBatchEventManagerExtQuery();
+  int TransactionBatchEventManagerBySprintf();
   int StreamingEventManager();
   int StreamingEventManagerString();
+  int StreamingEventManagerExtQuery();
+  int StreamingEventManagerBySprintf();
 
   const char * fitsFileName;
   int idObs;

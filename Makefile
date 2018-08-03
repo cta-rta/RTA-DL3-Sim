@@ -53,7 +53,7 @@ LIB_DESTDIR = lib
 CXX = g++
 
 #CXXFLAGS = -std=c++11 -O2 -I $(INCLUDE_DIR) $(RTALIB)
-CXXFLAGS = -std=c++11 -O2 -I $(INCLUDE_DIR) $(RTALIB) $(MYSQL_CXX_CNT)
+CXXFLAGS = -std=c++11 -O3 -funroll-loops  -I $(INCLUDE_DIR) $(RTALIB) $(MYSQL_CXX_CNT)	
 
 ifeq ($(DEBUG),1)
 	CXXFLAGS += -DDEBUG

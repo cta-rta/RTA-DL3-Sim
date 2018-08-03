@@ -14,6 +14,8 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ==========================================================================
 */
+/* Standard C includes */
+#include <string.h>
 
 /* Standard C++ includes */
 #include <stdlib.h>
@@ -44,6 +46,7 @@
 //#define EXAMPLE_USER "root"
 //#define EXAMPLE_PASS ""
 #define ONE_ROW 1
+#define QUERY_SIZE 2005000
 
 using namespace std;
 
@@ -55,8 +58,10 @@ public:
   int writeRowInDB(int idObs, int idRepo, double *dataWR);
   int writeTransactionInDB(int idObs, int idRepo, double *dataWR);
   int writeRowInDBByString(int idObs, int idRepo, double *dataWR);
-  int writeRowInDBByFprintf(int idObs, int idRepo, double *dataWR);
+  int writeRowInDBBySprintf(int idObs, int idRepo, double *dataWR);
   int writeTransactionInDBByString(int idObs, int idRepo, double *dataWR);
+  vector<string> queryConstructor(string _dbName, int nrows, double **dataWR);
+  int writeRowInDBExtQuery(string query);
   int startTransaction();
   int commitTransaction();
   int idObs;

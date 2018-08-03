@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
 		"1 - fitsFileNamePath: Input fits file path.\n"
 		"2 - idObs: Insert observation id.\n"
 		"3 - idRepo: Insert Repository id.\n"
-		"4 - insertMode: '0' to execute Batch insert mode,\n		'1' to execute Transaction Batch insert mode,\n		'2' to execute Streaming insert mode.\n"	//		'3' to execute Streaming by String insert mode.\n		'4' to execute Transaction Batch by string insert mode\n
+		"4 - insertMode: '0' to execute Batch insert mode,\n		'1' to execute Transaction Batch insert mode,\n		'2' to execute Streaming insert mode.\n		'3' to execute Batch external query insert mode.\n		'4' to execute Transaction Batch external query insert mode.\n		'5' to execute Streaming external query insert mode.\n		'6' to execute Batch by SPRINTF insert mode,\n		'7' to execute Transaction Batch by SPRINTF insert mode,\n		'8' to execute Streaming by SPRINTF insert mode,\n"
 		"5 - rate: How events per second insert in DB.\n"
 		"6 - host: Insert host name.\n"
 		"7 - userId: Input database user id.\n"
@@ -99,7 +99,31 @@ int main(int argc, char *argv[])
 
 		evtDL3Handler.StreamingEventManager();
 
-	} else if ( insertMode != 0 || insertMode != 1 || insertMode != 2 ) {	//|| insertMode != 3
+	} else if (insertMode == 3) {
+
+		evtDL3Handler.BatchEventManagerExtQuery();
+
+	} else if (insertMode == 4) {
+
+		evtDL3Handler.TransactionBatchEventManagerExtQuery();
+
+	} else if (insertMode == 5) {
+
+		evtDL3Handler.StreamingEventManagerExtQuery();
+
+	} else if (insertMode == 6) {
+
+		evtDL3Handler.BatchEventManagerBySprintf();
+
+	} else if (insertMode == 7) {
+
+		evtDL3Handler.TransactionBatchEventManagerBySprintf();
+
+	} else if (insertMode == 8) {
+
+		evtDL3Handler.StreamingEventManagerBySprintf();
+
+	}else if ( insertMode != 0 || insertMode != 1 || insertMode != 2 || insertMode != 3 || insertMode != 4 || insertMode != 5 || insertMode != 6|| insertMode != 7|| insertMode != 8) {	//|| insertMode != 3
 
 		cout << "ERROR: INSERT MODE PARAMETER! " << endl;
 
