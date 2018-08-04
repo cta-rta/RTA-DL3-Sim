@@ -33,6 +33,9 @@ endif
 ifndef BOOST_PATH
 $(error BOOST_PATH is not set.)
 endif
+ifndef HIREDIS_PATH
+$(error HIREDIS_PATH is not set.)
+endif
 
 ####### 1) Project names and system
 SYSTEM= $(shell gcc -dumpmachine)
@@ -53,7 +56,7 @@ LIB_DESTDIR = lib
 CXX = g++
 
 #CXXFLAGS = -std=c++11 -O2 -I $(INCLUDE_DIR) $(RTALIB)
-CXXFLAGS = -std=c++11 -O3 -funroll-loops  -I $(INCLUDE_DIR) $(RTALIB) $(MYSQL_CXX_CNT)	
+CXXFLAGS = -std=c++11 -O3 -funroll-loops  -I $(INCLUDE_DIR) $(RTALIB) $(MYSQL_CXX_CNT)
 
 ifeq ($(DEBUG),1)
 	CXXFLAGS += -DDEBUG
@@ -70,11 +73,16 @@ LIBS += -L$(CFITSIO)/lib -lcfitsio
 
 LIBS += -L$(MYSQL_CXX_CNT)/lib64 -lmysqlcppconn	#NEW ADDED
 
+LIBS += -L$(HIREDIS_PATH) -lhiredis #NEW ADDED
+
+
 CXXFLAGS += -I$(MYSQL_CXX_CNT)/include	#NEW ADDED
 
 CXXFLAGS += -I$(CFITSIO)/include
 
 CXXFLAGS += -I$(BOOST_PATH)	#NEW ADDED
+
+CXXFLAGS += -I$(HIREDIS_PATH)
 
 CXXFLAGS += -Wl,-Bdynamic	#NEW ADDED
 
