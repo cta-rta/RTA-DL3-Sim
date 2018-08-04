@@ -26,3 +26,4 @@ Il software estrae gli eventi dal file astri_000_41_001_00001_R_000001_001_0201_
   1. boost version 1.67.0;
   2. mysql-connector-cpp;
   3. cfitsio-3.370.
+  4. hiredis (master branch version)
