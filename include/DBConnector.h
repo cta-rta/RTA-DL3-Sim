@@ -25,26 +25,17 @@
 #include <chrono>
 #include <thread>
 
-#include <boost/scoped_ptr.hpp>
 
 
-#include "mysql_connection.h"
-#include "mysql_driver.h"
-#include "examples.h"
+
 #include "FileWriter.h"
 
 #include <chrono>
 #include <sys/time.h>
 #include <sstream>
-#include <cppconn/driver.h>
-#include <cppconn/exception.h>
-#include <cppconn/resultset.h>
-#include <cppconn/statement.h>
-#include <cppconn/prepared_statement.h>
 
-//#define EXAMPLE_HOST "localhost"
-//#define EXAMPLE_USER "root"
-//#define EXAMPLE_PASS ""
+
+
 #define ONE_ROW 1
 #define QUERY_SIZE 2005000
 
@@ -52,29 +43,25 @@ using namespace std;
 
 
 class DBConnector{
-public:
-  DBConnector(int _idObs, int _idRepo, string _host, string _userId, string _userPwd, string _dbName, string _tbName);
-  int connect();
-  int writeRowInDB(int idObs, int idRepo, double *dataWR);
-  int writeTransactionInDB(int idObs, int idRepo, double *dataWR);
-  int writeRowInDBByString(int idObs, int idRepo, double *dataWR);
-  int writeRowInDBBySprintf(int idObs, int idRepo, double *dataWR);
-  int writeTransactionInDBByString(int idObs, int idRepo, double *dataWR);
-  vector<string> queryConstructor(string _dbName, int nrows, double **dataWR);
-  int writeRowInDBExtQuery(string query);
-  int startTransaction();
-  int commitTransaction();
-  int idObs;
-  int idRepo;
-  sql::Driver *driver;
-  boost::shared_ptr <sql::Connection> con;
-  time_t timer;
-  string url;
-  string userId;
-  string userPwd;
-  string dbName;
-  string tbName;
+  public:
+
+    DBConnector(string _host, string _userId, string _userPwd, string _dbName);
+
+    virtual int connect() = 0;
+    virtual int startTransaction() = 0;
+    virtual int commitTransaction() = 0;
 
 
-private:
-};
+
+
+
+
+  private:
+    string url;
+    string userId;
+    string userPwd;
+    string dbName;
+
+
+
+ };
